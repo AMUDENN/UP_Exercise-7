@@ -171,7 +171,6 @@ namespace UP_Exercise_7
                         }
                     }
                 }
-                expression = Add_Fl(expression);
                 return expression;
             }
             catch (Exception ex)
@@ -225,51 +224,6 @@ namespace UP_Exercise_7
             {
                 if (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
                 {
-                    while (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
-                    {
-                        i++;
-                    }
-                    if (expression[i] == 'E')
-                    {
-                        i += 2;
-                        while (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
-                        {
-                            i++;
-                        }
-                    }
-                    else if (expression[i] == '.')
-                    {
-                        i++;
-                        int j = 0;
-                        while (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
-                        {
-                            j++;
-                            i++;
-                        }
-                        if (j < 2)
-                        {
-                            for (int e = 0; e < j; e++)
-                            {
-                                expression = expression.Insert(i, "0");
-                            }
-                        }
-                    }
-                    else if (i > 5 && expression[i - 5] != 'E' && expression[i - 4] != 'E' && expression[i - 3] != 'E')
-                    {
-                        expression = expression.Insert(i, ".00");
-                        i += 2;
-                    }
-                    else if (expression[i] != '.' && expression[i] != '!' && i <= 5)
-                    {
-                        expression = expression.Insert(i, ".00");
-                        i += 2;
-                    }
-                }
-            }
-            for (int i = 0; i < expression.Length; i++)
-            {
-                if (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
-                {
                     string res = "";
                     string ful_res = "";
 
@@ -284,12 +238,41 @@ namespace UP_Exercise_7
                         ful_res += expression[i];
                         i++;
                     }
-                    if (expression[i + 1] != 'E' && res.Length >= 17)
-                    {
-                        i -= ful_res.Length;
-                        i += Convert.ToDouble(res.Replace('.', ',')).ToString().Length;
 
-                        expression = expression.Replace(ful_res, Convert.ToDouble(res.Replace('.', ',')).ToString());
+                    if (expression[i] != 'E')
+                    {
+                        string num = Convert.ToDouble(res.Replace('.', ',')).ToString("E").Replace(',', '.');
+                        int ind = num.Length - 1;
+                        while (num[ind] != 'E')
+                        {
+                            if (num[ind] == '0')
+                            {
+                                num = num.Remove(ind, 1);
+                            }
+                            ind--;
+                        }
+                        if (!Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(num[num.Length - 1].ToString()))
+                        {
+                            num += '0';
+                        }
+                        string full = ful_res;
+                        if (ful_res.Contains('.'))
+                        {
+                            ful_res = ful_res.Remove(0, ful_res.IndexOf('.'));
+                            int index = expression.IndexOf(full);
+                            expression = expression.Remove(index, full.Length);
+                            expression = expression.Insert(index, "(" + num + "+0" + ful_res + ")");
+                            i -= full.Length;
+                            i += num.Length + ful_res.Length + 4;
+                        }
+                    }
+                    if (expression[i] == 'E')
+                    {
+                        i += 2;
+                        while (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
+                        {
+                            i++;
+                        }
                     }
                 }
             }
@@ -301,14 +284,17 @@ namespace UP_Exercise_7
             {
                 expression += "  ";
 
-                expression = Change_Symbols(expression);
+                expression = Change_Symbols(expression.Replace(',', '.'));
 
-                expression = Sqrt_str(expression);
+                expression = Sqrt_str(expression.Replace(',', '.'));
 
-                expression = Fact_str(expression);
+                expression = Fact_str(expression.Replace(',', '.'));
 
-                expression = Evaluate(Add_Fl(Change_Symbols(expression))).ToString().Replace(',', '.');
+                expression = Evaluate(Add_Fl(Change_Symbols(expression.Replace(',', '.')))).ToString();
+
                 MainTextBox.Text = expression;
+                MainTextBox.Focus();
+                MainTextBox.SelectionStart = MainTextBox.Text.Length;
             }
             catch (Exception ex)
             {
@@ -317,12 +303,28 @@ namespace UP_Exercise_7
         }
         public void MainTB(object sender, TextCompositionEventArgs args)
         {
-            if (!(values.Contains(args.Text.ToString()) || args.Text == "E"))
+            if (!(values.Contains(args.Text) || args.Text == "E"))
             {
                 args.Handled = true;
             }
-            else if (MainTextBox.Text.Replace("×", "*").Replace("÷", "/").Split("+-*/".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(args.Text))
+            else if (MainTextBox.Text.Split("×÷+-*/()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(args.Text))
             {
+                args.Handled = true;
+            }
+            if (args.Text == "*")
+            {
+                MainTextBox.Text = MainTextBox.Text.Trim('*');
+                MainTextBox.Text += "×";
+                MainTextBox.Focus();
+                MainTextBox.SelectionStart = MainTextBox.Text.Length;
+                args.Handled = true;
+            }
+            if (args.Text == "/")
+            {
+                MainTextBox.Text = MainTextBox.Text.Trim('/');
+                MainTextBox.Text += "÷";
+                MainTextBox.Focus();
+                MainTextBox.SelectionStart = MainTextBox.Text.Length;
                 args.Handled = true;
             }
         }
@@ -337,7 +339,7 @@ namespace UP_Exercise_7
                 }
                 else if (symbol == ".")
                 {
-                    if (!(MainTextBox.Text.Replace("×", "*").Replace("÷", "/").Split("+-*/".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(".")))
+                    if (!(MainTextBox.Text.Split("×÷+-*/()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(".")))
                     {
                         MainTextBox.Text += ".";
                     }
@@ -360,11 +362,14 @@ namespace UP_Exercise_7
                 MainTextBox.Text = ex.Message;
             }
         }
-        public void KeyDown(object sender, KeyEventArgs e)
+        public void TBKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter) { Calculate_Out(MainTextBox.Text); }
-            else if (e.Key == Key.Escape) { Keyboard.ClearFocus(); }
-           
+            if (e.Key == Key.Escape) { Keyboard.ClearFocus(); }
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
         }
     }
 }
