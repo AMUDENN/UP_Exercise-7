@@ -8,6 +8,6 @@
         Title="Демьянов Артём 2ПКС-220" Height="500" Width="800" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid>
         <UniformGrid Name="MainUniformGrid" Rows="5" Columns="5" Height="320" Width="780" Margin="10,154,10,10"> </UniformGrid>
-        <TextBox x:Name="MainTextBox" Style="{DynamicResource TextBoxStyle}" KeyDown="KeyDown" Height="130" Width="780" Margin="10,10,10,344"></TextBox>
+        <TextBox x:Name="MainTextBox" Style="{DynamicResource TextBoxStyle}" PreviewTextInput="MainTB" KeyDown="KeyDown" Height="130" Width="780" Margin="10,10,10,344"></TextBox>
     </Grid>
 </Window>
