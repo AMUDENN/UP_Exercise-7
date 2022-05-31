@@ -91,8 +91,8 @@ namespace UP_Exercise_7
                     }
                     if(expression[i] != '.')
                     {
-                        expression = expression.Insert(i, ".0");
-                        i++;
+                        expression = expression.Insert(i, ".00");
+                        i += 2;
                     }
                 }
             }
@@ -124,7 +124,7 @@ namespace UP_Exercise_7
                         {
                             int fact = Convert.ToInt32(res);
                             expression = expression.Remove(i - 1, expression.IndexOf('!') + 2 - i);
-                            expression = expression.Insert(i - 1, Factorial(fact).ToString());
+                            expression = expression.Insert(i - 1, Factorial(fact).ToString().Replace(',', '.'));
                         }
                         else
                         {
@@ -148,7 +148,7 @@ namespace UP_Exercise_7
                         {
                             int fact = Convert.ToInt32(exp);
                             expression = expression.Remove(i + 1, expression.IndexOf('!') - i);
-                            expression = expression.Insert(i + 1, Factorial(fact).ToString());
+                            expression = expression.Insert(i + 1, Factorial(fact).ToString().Replace(',', '.'));
                         }
                         else
                         {
@@ -156,7 +156,7 @@ namespace UP_Exercise_7
                         }
                     }
                 }
-                expression = Add_Fl(expression);
+                //expression = Add_Fl(expression);
                 result = Evaluate(Change_Symbols(expression)).ToString().Replace(',', '.');
                 MainTextBox.Text = result;
             }
