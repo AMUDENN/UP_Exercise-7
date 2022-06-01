@@ -241,7 +241,7 @@ namespace UP_Exercise_7
 
                     if (expression[i] != 'E')
                     {
-                        string num = Convert.ToDouble(res.Replace('.', ',')).ToString("E").Replace(',', '.');
+                        string num = Convert.ToDouble(res.Replace('.', ',')).ToString("E10").Replace(',', '.');
                         int ind = num.Length - 1;
                         while (num[ind] != 'E')
                         {
@@ -256,14 +256,19 @@ namespace UP_Exercise_7
                             num += '0';
                         }
                         string full = ful_res;
+                        int index = expression.IndexOf(full, i - full.Length);
                         if (ful_res.Contains('.'))
                         {
                             ful_res = ful_res.Remove(0, ful_res.IndexOf('.'));
-                            int index = expression.IndexOf(full);
                             expression = expression.Remove(index, full.Length);
                             expression = expression.Insert(index, "(" + num + "+0" + ful_res + ")");
                             i -= full.Length;
                             i += num.Length + ful_res.Length + 4;
+                        }
+                        else
+                        {
+                            expression = expression.Remove(index, full.Length);
+                            expression = expression.Insert(index, num);
                         }
                     }
                     if (expression[i] == 'E')
@@ -366,10 +371,7 @@ namespace UP_Exercise_7
         {
             if (e.Key == Key.Enter) { Calculate_Out(MainTextBox.Text); }
             if (e.Key == Key.Escape) { Keyboard.ClearFocus(); }
-            if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-            }
+            if (e.Key == Key.Space) { e.Handled = true; }
         }
     }
 }
