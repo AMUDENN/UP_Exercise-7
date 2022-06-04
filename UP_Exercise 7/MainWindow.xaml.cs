@@ -17,8 +17,9 @@ namespace UP_Exercise_7
 {
     public partial class MainWindow : Window
     {
-        static BrushConverter converter = new System.Windows.Media.BrushConverter();
-        static string[] values = { "!", "(", ")", "%", "CE", "√", "7", "8", "9", "÷", "^", "4", "5", "6", "×", "π", "1", "2", "3", "-", "e", "0", ".", "=", "+" };
+        public static BrushConverter converter = new System.Windows.Media.BrushConverter();
+        public static string[] values = { "(", ")", "%", "←", "CE", "!", "7", "8", "9", "÷", "√", "4", "5", "6", "×", "π", "1", "2", "3", "-", "e", "0", ".", "=", "+" };
+        public static string[] numbers = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
         public MainWindow()
         {
             InitializeComponent();
@@ -35,299 +36,41 @@ namespace UP_Exercise_7
                 };
                 button.Click += ButtonClick;
                 button.Foreground = value == "=" ? (Brush)converter.ConvertFromString("#fff") : (Brush)converter.ConvertFromString("#202124");
-                button.Background = Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(value) || value == "." ? (Brush)converter.ConvertFromString("#f1f3f4") : value == "=" ? (Brush)converter.ConvertFromString("#4285f4") : (Brush)converter.ConvertFromString("#dadce0");
+                button.Background = numbers.Contains(value) || value == "." ? (Brush)converter.ConvertFromString("#f1f3f4") : value == "=" ? (Brush)converter.ConvertFromString("#4285f4") : (Brush)converter.ConvertFromString("#dadce0");
                 MainUniformGrid.Children.Add(button);
             }
         }
-        public static double Evaluate(string expression)
+        public void TextChangedMainTB(object sender, TextCompositionEventArgs args)
         {
-            System.Data.DataTable table = new System.Data.DataTable();
-            return Convert.ToDouble(table.Compute(expression, String.Empty));
-        }
-        public static string Change_Symbols(string expression)
-        {
-            string new_expression = "";
-            for (int i = 0; i < expression.Length; i++)
+            if (MainTextBox.SelectionStart == MainTextBox.Text.Length)
             {
-                switch (expression[i])
+                if (!("0123456789*/+-.()".Contains(args.Text) || args.Text == "E"))
                 {
-                    case ')':
-                        new_expression += ')';
-                        Console.WriteLine(new_expression);
-                        Console.WriteLine(i);
-                        if (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i + 1].ToString()))
-                        {
-                            new_expression += '*';
-                            break;
-                        }
-                        break;
-                    case '√':
-                        if (i > 0 && Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i - 1].ToString()))
-                        {
-                            new_expression += "*";
-                        }
-                        new_expression += '√';
-                        break;
-                    case '%':
-                        new_expression += "/100.00";
-                        break;
-                    case '÷':
-                        new_expression += '/';
-                        break;
-                    case '×':
-                        new_expression += '*';
-                        break;
-                    case 'π':
-                        new_expression += Math.PI.ToString().Replace(',', '.');
-                        if (i > 0 && Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i - 1].ToString()))
-                        {
-                            new_expression = new_expression.Insert(new_expression.Length - Math.PI.ToString().Length, "*");
-                            break;
-                        }
-                        if (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i + 1].ToString()))
-                        {
-                            new_expression += '*';
-                            break;
-                        }
-                        break;
-                    case 'e':
-                        new_expression += Math.Exp(1).ToString().Replace(',', '.');
-                        if (i > 0 && Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i - 1].ToString()))
-                        {
-                            new_expression = new_expression.Insert(new_expression.Length - Math.Exp(1).ToString().Length, "*");
-                            break;
-                        }
-                        if (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i + 1].ToString()))
-                        {
-                            new_expression += '*';
-                            break;
-                        }
-                        break;
-                    default:
-                        new_expression += expression[i];
-                        break;
+                    args.Handled = true;
+                }
+                else if (MainTextBox.Text.Split("×÷+-()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(args.Text))
+                {
+                    args.Handled = true;
+                }
+                if (args.Text == "*")
+                {
+                    MainTextBox.Text = MainTextBox.Text.Trim('*');
+                    MainTextBox.Text += "×";
+                    MainTextBox.Focus();
+                    MainTextBox.SelectionStart = MainTextBox.Text.Length;
+                    args.Handled = true;
+                }
+                if (args.Text == "/")
+                {
+                    MainTextBox.Text = MainTextBox.Text.Trim('/');
+                    MainTextBox.Text += "÷";
+                    MainTextBox.Focus();
+                    MainTextBox.SelectionStart = MainTextBox.Text.Length;
+                    args.Handled = true;
                 }
             }
-            return new_expression;
-        }
-        public double Factorial(int fact)
-        {
-            double result = 1;
-            for (int i = 2; i <= fact; i++)
+            else
             {
-                result *= i;
-            }
-            return result;
-        }
-        public string Fact_str(string expression)
-        {
-            try
-            {
-                while (expression.Contains('!'))
-                {
-                    int i = expression.IndexOf('!');
-                    string exp = "";
-                    string res = "";
-                    if (expression[i - 1] == ')')
-                    {
-                        while (expression[i - 1] != '(')
-                        {
-                            exp = exp.Insert(0, expression[i - 1].ToString());
-                            i--;
-                        }
-                        exp = exp.Insert(0, "(");
-                        exp = Add_Fl(exp);
-                        res = Evaluate(Change_Symbols(exp)).ToString().Replace(',', '.');
-                        Exception ex = ExceptionFunctions.Ex_Int(res, "Факториал", 0, 170);
-                        if (ex == null)
-                        {
-                            int fact = Convert.ToInt32(res);
-                            expression = expression.Remove(i - 1, expression.IndexOf('!') + 2 - i);
-                            expression = expression.Insert(i - 1, Factorial(fact).ToString().Replace(',', '.'));
-                        }
-                        else
-                        {
-                            throw ex;
-                        }
-                    }
-                    else
-                    {
-                        i--;
-                        while (i >= 0 && (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()) || expression[i] == '.'))
-                        {
-                            exp = exp.Insert(0, expression[i].ToString());
-                            i--;
-                        }
-                        Exception ex = ExceptionFunctions.Ex_Int(exp, "Факториал", 0, 170);
-                        if (ex == null)
-                        {
-                            int fact = Convert.ToInt32(exp);
-                            expression = expression.Remove(i + 1, expression.IndexOf('!') - i);
-                            expression = expression.Insert(i + 1, Factorial(fact).ToString().Replace(',', '.'));
-                        }
-                        else
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                return expression;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-        public string Sqrt_str(string expression)
-        {
-            try
-            {
-                while (expression.Contains('√'))
-                {
-                    int i = expression.IndexOf('√');
-                    int j;
-                    int index = expression.IndexOf('√');
-                    string exp = "";
-                    string res = "";
-
-                    while (expression[i] != ')')
-                    {
-                        i++;
-                    }
-                    j = i;
-                    while (expression[i - 1] != '(')
-                    {
-                        exp = exp.Insert(0, expression[i - 1].ToString());
-                        i--;
-                    }
-                    exp = exp.Insert(0, "(");
-                    exp = exp.Insert(exp.Length, ") ");
-                    exp = Add_Fl(exp);
-                    res = Evaluate(Change_Symbols(exp)).ToString();
-
-                    double sqr = Convert.ToDouble(res);
-                    expression = expression.Remove(index, j - index + 1);
-                    expression = expression.Insert(index, Math.Sqrt(sqr).ToString().Replace(',', '.'));
-
-                    expression = Add_Fl(expression);
-                }
-                return expression;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-        public static string Add_Fl(string expression)
-        {
-            for (int i = 0; i < expression.Length; i++)
-            {
-                if (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
-                {
-                    string res = "";
-                    string ful_res = "";
-
-                    while (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
-                    {
-                        res += expression[i];
-                        i++;
-                    }
-                    ful_res = res;
-                    while (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()) || expression[i] == '.')
-                    {
-                        ful_res += expression[i];
-                        i++;
-                    }
-
-                    if (expression[i] != 'E')
-                    {
-                        string num = Convert.ToDouble(res.Replace('.', ',')).ToString("E10").Replace(',', '.');
-                        int ind = num.Length - 1;
-                        while (num[ind] != 'E')
-                        {
-                            if (num[ind] == '0')
-                            {
-                                num = num.Remove(ind, 1);
-                            }
-                            ind--;
-                        }
-                        if (!Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(num[num.Length - 1].ToString()))
-                        {
-                            num += '0';
-                        }
-                        string full = ful_res;
-                        int index = expression.IndexOf(full, i - full.Length);
-                        if (ful_res.Contains('.'))
-                        {
-                            ful_res = ful_res.Remove(0, ful_res.IndexOf('.'));
-                            expression = expression.Remove(index, full.Length);
-                            expression = expression.Insert(index, "(" + num + "+0" + ful_res + ")");
-                            i -= full.Length;
-                            i += num.Length + ful_res.Length + 4;
-                        }
-                        else
-                        {
-                            expression = expression.Remove(index, full.Length);
-                            expression = expression.Insert(index, num);
-                        }
-                    }
-                    if (expression[i] == 'E')
-                    {
-                        i += 2;
-                        while (Enumerable.Range(0, 10).Select(x => x.ToString()).Contains(expression[i].ToString()))
-                        {
-                            i++;
-                        }
-                    }
-                }
-            }
-            return expression;
-        }
-        public void Calculate_Out(string expression)
-        {
-            try
-            {
-                expression += "  ";
-
-                expression = Change_Symbols(expression.Replace(',', '.'));
-
-                expression = Sqrt_str(expression.Replace(',', '.'));
-
-                expression = Fact_str(expression.Replace(',', '.'));
-
-                expression = Evaluate(Add_Fl(Change_Symbols(expression.Replace(',', '.')))).ToString();
-
-                MainTextBox.Text = expression;
-                MainTextBox.Focus();
-                MainTextBox.SelectionStart = MainTextBox.Text.Length;
-            }
-            catch (Exception ex)
-            {
-                MainTextBox.Text = ex.Message;
-            }
-        }
-        public void MainTB(object sender, TextCompositionEventArgs args)
-        {
-            if (!(values.Contains(args.Text) || args.Text == "E"))
-            {
-                args.Handled = true;
-            }
-            else if (MainTextBox.Text.Split("×÷+-*/()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(args.Text))
-            {
-                args.Handled = true;
-            }
-            if (args.Text == "*")
-            {
-                MainTextBox.Text = MainTextBox.Text.Trim('*');
-                MainTextBox.Text += "×";
-                MainTextBox.Focus();
-                MainTextBox.SelectionStart = MainTextBox.Text.Length;
-                args.Handled = true;
-            }
-            if (args.Text == "/")
-            {
-                MainTextBox.Text = MainTextBox.Text.Trim('/');
-                MainTextBox.Text += "÷";
                 MainTextBox.Focus();
                 MainTextBox.SelectionStart = MainTextBox.Text.Length;
                 args.Handled = true;
@@ -342,20 +85,106 @@ namespace UP_Exercise_7
                 {
                     MainTextBox.Text = "";
                 }
+                else if (MainTextBox.Text.Length > 0 && MainTextBox.Text[MainTextBox.Text.Length - 1] == ')' && (numbers.Contains(symbol) || symbol == "√"))
+                {
+                    MainTextBox.Text += "×";
+                    MainTextBox.Text += symbol;
+                    if (symbol == "√")
+                    {
+                        MainTextBox.Text += "(";
+                    }
+                }
                 else if (symbol == ".")
                 {
-                    if (!(MainTextBox.Text.Split("×÷+-*/()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(".")))
+                    if (!(MainTextBox.Text.Split("×÷+-()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(".")))
                     {
+                        if (MainTextBox.Text.Length == 0 || MainTextBox.Text.Length > 0 && !numbers.Contains(MainTextBox.Text[MainTextBox.Text.Length - 1].ToString()))
+                        {
+                            MainTextBox.Text += "0";
+                        }
                         MainTextBox.Text += ".";
                     }
                 }
+                else if (symbol == "(")
+                {
+                    if(MainTextBox.Text.Length > 0 && !"×÷+-(".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    {
+                        MainTextBox.Text += "×";
+                    }
+                    MainTextBox.Text += "(";
+                }
                 else if (symbol == "√")
                 {
+                    if (MainTextBox.Text.Length > 0 && !"×÷+-".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    {
+                        MainTextBox.Text += "×";
+                    }
                     MainTextBox.Text += "√(";
+                }
+                else if (symbol == "←")
+                {
+                    if (MainTextBox.Text.Length > 0)
+                    {
+                        MainTextBox.Text = MainTextBox.Text.Substring(0, MainTextBox.Text.Length - 1);
+                    }
+                }
+                else if (symbol == "!")
+                {
+                    if (MainTextBox.Text.Length == 0 || "+-×÷".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    {
+                        MainTextBox.Text += "(0)!";
+                    }
+                    else if (MainTextBox.Text[MainTextBox.Text.Length - 1] == '(')
+                    {
+                        if (MainTextBox.Text.Length >= 2 && MainTextBox.Text[MainTextBox.Text.Length - 2] == '√')
+                        {
+                            MainTextBox.Text = MainTextBox.Text.Insert(MainTextBox.Text.Length - 2, "(");
+                            MainTextBox.Text += "0))!";
+                        }
+                        else
+                        {
+                            MainTextBox.Text += "0)!";
+                        }
+                    }
+                    else if (MainTextBox.Text[MainTextBox.Text.Length - 1] == ')')
+                    {
+                        MainTextBox.Text += "!";
+                    }
+                    else 
+                    {
+                        int i = MainTextBox.Text.Length - 1;
+                        while (i > 0 && !"+-×÷()√^".Contains(MainTextBox.Text[i]))
+                        {
+                            if (numbers.Contains(MainTextBox.Text[i].ToString()) || MainTextBox.Text[i] == '.')
+                            {
+                                i--;
+                            }
+                            if ("+-".Contains(MainTextBox.Text[i].ToString()) && i > 0)
+                            {
+                                if (MainTextBox.Text[i - 1].ToString() == "E")
+                                {
+                                    i -= 2;
+                                }
+                            }
+                        }
+                        if (i == 0)
+                        {
+                            MainTextBox.Text = MainTextBox.Text.Insert(i, "(");
+                        }
+                        else
+                        {
+                            i += MainTextBox.Text.Length - 1 == i ? 0 : 1;
+                            MainTextBox.Text = MainTextBox.Text.Insert(i, "(");
+                        }
+                        MainTextBox.Text += ")!";
+                    }
                 }
                 else if (symbol == "=")
                 {
-                    Calculate_Out(MainTextBox.Text);
+                    if(MainTextBox.Text.Length > 0)
+                    {
+                       MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text);
+                    }
                 }
                 else
                 {
@@ -369,7 +198,7 @@ namespace UP_Exercise_7
         }
         public void TBKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter) { Calculate_Out(MainTextBox.Text); }
+            if (e.Key == Key.Enter) { MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text); }
             if (e.Key == Key.Escape) { Keyboard.ClearFocus(); }
             if (e.Key == Key.Space) { e.Handled = true; }
         }
