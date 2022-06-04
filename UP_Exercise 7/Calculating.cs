@@ -255,8 +255,13 @@ namespace UP_Exercise_7
 
                 expression = Fact_str(expression);
 
-                expression = Evaluate(Add_Fl(Change_Symbols(expression.Replace(',', '.')))).ToString();
+                ex = ExceptionFunctions.Ex_Double(expression, "Результат");
+                if (ex != null)
+                {
+                    throw new Exception(expression);
+                }
 
+                expression = Evaluate(Add_Fl(Change_Symbols(expression.Replace(',', '.')))).ToString();
                 ex = ExceptionFunctions.Ex_Double(expression, "Результат");
                 if (ex == null)
                 {
