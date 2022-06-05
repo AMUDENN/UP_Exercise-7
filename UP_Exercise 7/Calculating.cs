@@ -6,8 +6,20 @@ using System.Threading.Tasks;
 
 namespace UP_Exercise_7
 {
+    public class CalculateEventArgs
+    {
+        public string Message { get; }
+
+        public CalculateEventArgs(string msg)
+        {
+            Message = msg;
+        }
+    }
     internal class Calculating
     {
+        public delegate void Message(CalculateEventArgs e);
+        public static event Message ErrorMessage;
+
         public static string[] numbers = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
         public static double Evaluate(string expression)
         {
@@ -255,8 +267,10 @@ namespace UP_Exercise_7
 
                 expression = Fact_str(expression);
 
-                expression = Evaluate(Add_Fl(Change_Symbols(expression.Replace(',', '.')))).ToString();
-                
+                if (!expression.Contains("Факториал"))
+                {
+                    expression = Evaluate(Add_Fl(Change_Symbols(expression.Replace(',', '.')))).ToString();
+                }
                 ex = ExceptionFunctions.Ex_Double(expression, "Результат");
                 if (ex == null)
                 {
@@ -269,6 +283,7 @@ namespace UP_Exercise_7
             }
             catch (Exception ex)
             {
+                ErrorMessage(new CalculateEventArgs(ex.Message));
                 return ex.Message;
             }
         }

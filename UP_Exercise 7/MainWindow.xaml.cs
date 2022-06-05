@@ -24,6 +24,11 @@ namespace UP_Exercise_7
         {
             InitializeComponent();
             SetButtons();
+            Calculating.ErrorMessage += ShowError;
+        }
+        public void ShowError(CalculateEventArgs e)
+        {
+            MessageBox.Show(e.Message);
         }
         public void SetButtons()
         {
