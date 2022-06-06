@@ -18,12 +18,13 @@ namespace UP_Exercise_7
     public partial class MainWindow : Window
     {
         public static BrushConverter converter = new System.Windows.Media.BrushConverter();
-        public static string[] values = { "(", ")", "%", "←", "CE", "!", "7", "8", "9", "÷", "√", "4", "5", "6", "×", "π", "1", "2", "3", "-", "e", "0", ".", "=", "+" };
+        public static string[] values = { "(", ")", "%", "←", "CE", "(x)!", "7", "8", "9", "÷", "√(x)", "4", "5", "6", "×", "π", "1", "2", "3", "-", "e", "0", ".", "=", "+" };
         public static string[] numbers = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
         public MainWindow()
         {
             InitializeComponent();
             SetButtons();
+            ChangeSelStart();
             Calculating.ErrorMessage += ShowError;
         }
         public void ShowError(CalculateEventArgs e)
@@ -53,7 +54,7 @@ namespace UP_Exercise_7
                 {
                     args.Handled = true;
                 }
-                else if (MainTextBox.Text.Split("×÷+-()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(args.Text))
+                else if (MainTextBox.Text.Split("×÷+-()".ToCharArray()).Last().Count(x => ".".Contains(x)) == 1 && ".".Contains(args.Text))
                 {
                     args.Handled = true;
                 }
@@ -61,34 +62,30 @@ namespace UP_Exercise_7
                 {
                     MainTextBox.Text = MainTextBox.Text.Trim('*');
                     MainTextBox.Text += "×";
-                    MainTextBox.Focus();
-                    MainTextBox.SelectionStart = MainTextBox.Text.Length;
                     args.Handled = true;
                 }
                 if (args.Text == "/")
                 {
                     MainTextBox.Text = MainTextBox.Text.Trim('/');
                     MainTextBox.Text += "÷";
-                    MainTextBox.Focus();
-                    MainTextBox.SelectionStart = MainTextBox.Text.Length;
                     args.Handled = true;
                 }
             }
             else
             {
-                MainTextBox.Focus();
-                MainTextBox.SelectionStart = MainTextBox.Text.Length;
+                MainTextBox.Text += args.Text;
                 args.Handled = true;
             }
+            ChangeSelStart();
         }
         public void ButtonClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                string symbol = sender.ToString().Split(' ').Last();
+                string symbol = ((Button)sender).Content.ToString();
                 if (symbol == "CE")
                 {
-                    MainTextBox.Text = "";
+                    MainTextBox.Clear();
                 }
                 else if (MainTextBox.Text.Length > 0 && MainTextBox.Text[MainTextBox.Text.Length - 1] == ')' && (numbers.Contains(symbol) || symbol == "√"))
                 {
@@ -112,15 +109,15 @@ namespace UP_Exercise_7
                 }
                 else if (symbol == "(")
                 {
-                    if(MainTextBox.Text.Length > 0 && !"×÷+-(".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    if(MainTextBox.Text.Length > 0 && !"%×÷+-(".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
                     {
                         MainTextBox.Text += "×";
                     }
                     MainTextBox.Text += "(";
                 }
-                else if (symbol == "√")
+                else if (symbol == "√(x)")
                 {
-                    if (MainTextBox.Text.Length > 0 && !"×÷+-".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    if (MainTextBox.Text.Length > 0 && !"%×÷+-".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
                     {
                         MainTextBox.Text += "×";
                     }
@@ -133,11 +130,36 @@ namespace UP_Exercise_7
                         MainTextBox.Text = MainTextBox.Text.Substring(0, MainTextBox.Text.Length - 1);
                     }
                 }
-                else if (symbol == "!")
+                else if (symbol == "(x)!")
                 {
-                    if (MainTextBox.Text.Length == 0 || "+-×÷".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    if (MainTextBox.Text.Length == 0 || "%×÷+-".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
                     {
                         MainTextBox.Text += "(0)!";
+                    }
+                    else if (MainTextBox.Text[MainTextBox.Text.Length - 1] == '!')
+                    {
+                        int i = MainTextBox.Text.IndexOf('!') - 1;
+                        string exp = "";
+
+                        int count_f = 0;
+                        int count_l = 1;
+                        while (count_f != count_l)
+                        {
+                            i--;
+                            if (MainTextBox.Text[i] == ')')
+                            {
+                                count_l++;
+                            }
+                            if (MainTextBox.Text[i] == '(')
+                            {
+                                count_f++;
+                            }
+                            exp = exp.Insert(0, MainTextBox.Text[i].ToString());
+                        }
+                        exp += ")!)!";
+                        exp = exp.Insert(0, "(");
+                        MainTextBox.Text = MainTextBox.Text.Remove(i, MainTextBox.Text.IndexOf('!') - i + 1);
+                        MainTextBox.Text = MainTextBox.Text.Insert(i, exp);
                     }
                     else if (MainTextBox.Text[MainTextBox.Text.Length - 1] == '(')
                     {
@@ -155,12 +177,12 @@ namespace UP_Exercise_7
                     {
                         MainTextBox.Text += "!";
                     }
-                    else 
+                    else
                     {
                         int i = MainTextBox.Text.Length - 1;
-                        while (i > 0 && !"+-×÷()√^".Contains(MainTextBox.Text[i]))
+                        while (i > 0 && !"+-×÷()√".Contains(MainTextBox.Text[i]))
                         {
-                            if (numbers.Contains(MainTextBox.Text[i].ToString()) || MainTextBox.Text[i] == '.')
+                            if (numbers.Contains(MainTextBox.Text[i].ToString()) || "πe".Contains(MainTextBox.Text[i]) || MainTextBox.Text[i] == '.')
                             {
                                 i--;
                             }
@@ -172,11 +194,11 @@ namespace UP_Exercise_7
                                 }
                             }
                         }
-                        if (i == 0)
+                        if (i == 0 && !"(+-".Contains(MainTextBox.Text[i]))
                         {
                             MainTextBox.Text = MainTextBox.Text.Insert(i, "(");
                         }
-                        else
+                        else if (MainTextBox.Text[i] != '(')
                         {
                             i += MainTextBox.Text.Length - 1 == i ? 0 : 1;
                             MainTextBox.Text = MainTextBox.Text.Insert(i, "(");
@@ -186,15 +208,24 @@ namespace UP_Exercise_7
                 }
                 else if (symbol == "=")
                 {
-                    if(MainTextBox.Text.Length > 0)
+                    if (MainTextBox.Text.Length > 0)
                     {
-                       MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text);
+                        MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text);
                     }
+                }
+                else if (numbers.Contains(symbol))
+                {
+                    if (MainTextBox.Text.Length > 0 && MainTextBox.Text[MainTextBox.Text.Length - 1] == '%')
+                    {
+                        MainTextBox.Text += '×';
+                    }
+                    MainTextBox.Text += symbol;
                 }
                 else
                 {
                     MainTextBox.Text += symbol;
                 }
+                ChangeSelStart();
             }
             catch (Exception ex)
             {
@@ -204,8 +235,12 @@ namespace UP_Exercise_7
         public void TBKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter) { MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text); }
-            if (e.Key == Key.Escape) { Keyboard.ClearFocus(); }
             if (e.Key == Key.Space) { e.Handled = true; }
+        }
+        public void ChangeSelStart()
+        {
+            MainTextBox.Focus();
+            MainTextBox.SelectionStart = MainTextBox.Text.Length;
         }
     }
 }

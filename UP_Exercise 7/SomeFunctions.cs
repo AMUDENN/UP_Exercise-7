@@ -15,11 +15,11 @@ namespace UP_Exercise_7
                 double result = Convert.ToDouble(input_str);
                 if (result < min)
                 {
-                    throw new Exception($"Введено число {data} меньше минимального предела: {min}");
+                    throw new Exception($"Ошибка! Введено число {data} меньше минимального предела: {min}");
                 }
                 if (result > max)
                 {
-                    throw new Exception($"Введено число {data} больше максимального предела: {max}");
+                    throw new Exception($"Ошибка! Введено число {data} больше максимального предела: {max}");
                 }
             }
             catch (Exception ex)
@@ -36,11 +36,11 @@ namespace UP_Exercise_7
                 int result = Convert.ToInt32(input_str);
                 if (result < min)
                 {
-                    throw new Exception($"Введено число {data} меньше минимального предела: {min}");
+                    throw new Exception($"Ошибка! Введено число {data} меньше минимального предела: {min}");
                 }
                 if (result > max)
                 {
-                    throw new Exception($"Введено число {data} больше максимального предела: {max}");
+                    throw new Exception($"Ошибка! Введено число {data} больше максимального предела: {max}");
                 }
             }
             catch (Exception ex)

@@ -34,7 +34,7 @@ namespace UP_Exercise_7
                 switch (expression[i])
                 {
                     case '%':
-                        new_expression += "/100.00";
+                        new_expression += "/100";
                         break;
                     case '÷':
                         new_expression += '/';
@@ -44,7 +44,7 @@ namespace UP_Exercise_7
                         break;
                     case 'π':
                         new_expression += Math.PI.ToString().Replace(',', '.');
-                        if (i > 0 && numbers.Contains(expression[i - 1].ToString()))
+                        if (i > 0 && (numbers.Contains(expression[i - 1].ToString()) || "eπ".Contains(expression[i - 1])))
                         {
                             new_expression = new_expression.Insert(new_expression.Length - Math.PI.ToString().Length, "*");
                             break;
@@ -57,7 +57,7 @@ namespace UP_Exercise_7
                         break;
                     case 'e':
                         new_expression += Math.Exp(1).ToString().Replace(',', '.');
-                        if (i > 0 && numbers.Contains(expression[i - 1].ToString()))
+                        if (i > 0 && (numbers.Contains(expression[i - 1].ToString())|| "eπ".Contains(expression[i - 1])))
                         {
                             new_expression = new_expression.Insert(new_expression.Length - Math.Exp(1).ToString().Length, "*");
                             break;
@@ -113,11 +113,16 @@ namespace UP_Exercise_7
                     exp = Add_Fl(exp);
                     res = Evaluate(Change_Symbols(exp)).ToString().Replace(',', '.');
                     Exception ex = ExceptionFunctions.Ex_Int(res, "Факториал", 0, 170);
+                    Exception ex_d = ExceptionFunctions.Ex_Double(res.Replace('.', ','), "Факториал");
                     if (ex == null)
                     {
                         int fact = Convert.ToInt32(res);
                         expression = expression.Remove(i, expression.IndexOf('!') - i + 1);
                         expression = expression.Insert(i, Factorial(fact).ToString().Replace(',', '.'));
+                    }
+                    else if (ex_d == null)
+                    {
+                        throw new Exception("Факториал: Ошибка! Неверный тип данных! Введите целое число!");
                     }
                     else
                     {
@@ -208,19 +213,8 @@ namespace UP_Exercise_7
                     if (expression[i] != 'E')
                     {
                         string num = Convert.ToDouble(res.Replace('.', ',')).ToString("E10").Replace(',', '.');
-                        int ind = num.Length - 1;
-                        while (num[ind] != 'E')
-                        {
-                            if (num[ind] == '0')
-                            {
-                                num = num.Remove(ind, 1);
-                            }
-                            ind--;
-                        }
-                        if (!numbers.Contains(num[num.Length - 1].ToString()))
-                        {
-                            num += '0';
-                        }
+                        int ind = num.Length;
+                        num = num.Remove(ind - 3, 3).Insert(ind - 3, Convert.ToInt32(num.Substring(ind - 3, 3)).ToString());
                         string full = ful_res;
                         int index = expression.IndexOf(full, i - full.Length);
                         if (ful_res.Contains('.'))
@@ -235,6 +229,8 @@ namespace UP_Exercise_7
                         {
                             expression = expression.Remove(index, full.Length);
                             expression = expression.Insert(index, num);
+                            i -= full.Length;
+                            i += num.Length;
                         }
                     }
                     if (expression[i] == 'E')
@@ -251,6 +247,7 @@ namespace UP_Exercise_7
         }
         public static string Calculate_Out(string expression)
         {
+            string old_expression = expression;
             try
             {
                 if (expression.Where(x => x == '(').Count() != expression.Where(x => x == ')').Count())
@@ -267,9 +264,13 @@ namespace UP_Exercise_7
 
                 expression = Fact_str(expression);
 
-                if (!expression.Contains("Факториал"))
+                if (!expression.ToLower().Contains("ошибка"))
                 {
                     expression = Evaluate(Add_Fl(Change_Symbols(expression.Replace(',', '.')))).ToString();
+                }
+                else
+                {
+                    throw new Exception(expression);
                 }
                 ex = ExceptionFunctions.Ex_Double(expression, "Результат");
                 if (ex == null)
@@ -278,13 +279,13 @@ namespace UP_Exercise_7
                 }
                 else
                 {
-                    throw new Exception(expression);
+                    throw ex;
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage(new CalculateEventArgs(ex.Message));
-                return ex.Message;
+                ErrorMessage(new CalculateEventArgs($"Ошибка: {ex.Message} \nНекорректное выражение: \n{old_expression}"));
+                return "Некорректное выражение";
             }
         }
     }
