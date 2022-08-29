@@ -100,10 +100,15 @@ namespace UP_Exercise_7
                 {
                     if (!(MainTextBox.Text.Split("×÷+-()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(".")))
                     {
+                        if (MainTextBox.Text.LastIndexOf("E") >= MainTextBox.Text.Length - 5)
+                        {
+                            MainTextBox.Text += "×";
+                        }
                         if (MainTextBox.Text.Length == 0 || MainTextBox.Text.Length > 0 && !numbers.Contains(MainTextBox.Text[MainTextBox.Text.Length - 1].ToString()))
                         {
                             MainTextBox.Text += "0";
                         }
+                        
                         MainTextBox.Text += ".";
                     }
                 }
