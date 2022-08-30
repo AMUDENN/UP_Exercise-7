@@ -85,6 +85,7 @@ namespace UP_Exercise_7
                 string symbol = ((Button)sender).Content.ToString();
                 if (symbol == "CE")
                 {
+                    HistoryTextBox.Clear();
                     MainTextBox.Clear();
                 }
                 else if (MainTextBox.Text.Length > 0 && MainTextBox.Text[MainTextBox.Text.Length - 1] == ')' && (numbers.Contains(symbol) || symbol == "√"))
@@ -122,7 +123,7 @@ namespace UP_Exercise_7
                 }
                 else if (symbol == "√(x)")
                 {
-                    if (MainTextBox.Text.Length > 0 && !"%×÷+-".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    if (MainTextBox.Text.Length > 0 && !"(%×÷+-".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
                     {
                         MainTextBox.Text += "×";
                     }
@@ -215,7 +216,8 @@ namespace UP_Exercise_7
                 {
                     if (MainTextBox.Text.Length > 0)
                     {
-                        MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text);
+                        HistoryTextBox.Text = MainTextBox.Text + " =";
+                        MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text);  
                     }
                 }
                 else if (numbers.Contains(symbol))
@@ -239,7 +241,11 @@ namespace UP_Exercise_7
         }
         public void TBKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter) { MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text); }
+            if (e.Key == Key.Enter) { 
+                HistoryTextBox.Text = MainTextBox.Text + " ="; 
+                MainTextBox.Text = Calculating.Calculate_Out(MainTextBox.Text);
+                e.Handled = true; 
+            }
             if (e.Key == Key.Space) { e.Handled = true; }
         }
         public void ChangeSelStart()

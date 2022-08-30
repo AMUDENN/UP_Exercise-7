@@ -11,5 +11,6 @@
         <UniformGrid Name="MainUniformGrid" Rows="5" Columns="5" Height="320" Width="780" Margin="10,154,10,10"> </UniformGrid>
         <TextBox x:Name="MainTextBox" Style="{DynamicResource TextBoxStyle}" Focusable="True"  PreviewKeyDown="TBKeyDown" PreviewTextInput="TextChangedMainTB"
                  Height="130" Width="780" Margin="10,10,10,344"></TextBox>
+        <TextBox x:Name="HistoryTextBox" Height="30" Width="730" FontSize="17" Focusable="False" BorderThickness="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" Margin="50,20,20,434"></TextBox>
     </Grid>
 </Window>
