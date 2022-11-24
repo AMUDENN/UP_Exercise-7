@@ -44,7 +44,7 @@ namespace UP_Exercise_7
                         break;
                     case 'π':
                         new_expression += Math.PI.ToString().Replace(',', '.');
-                        if (i > 0 && (numbers.Contains(expression[i - 1].ToString()) || "eπ".Contains(expression[i - 1])))
+                        if (i > 0 && (numbers.Contains(expression[i - 1].ToString()) || "eπ)".Contains(expression[i - 1])))
                         {
                             new_expression = new_expression.Insert(new_expression.Length - Math.PI.ToString().Length, "*");
                             break;

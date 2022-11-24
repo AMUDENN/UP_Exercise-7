@@ -50,7 +50,7 @@ namespace UP_Exercise_7
         {
             if (MainTextBox.SelectionStart == MainTextBox.Text.Length)
             {
-                if (!("0123456789*/+-.()".Contains(args.Text) || args.Text == "E"))
+                if (!"0123456789*/+-.()E".Contains(args.Text))
                 {
                     args.Handled = true;
                 }
@@ -99,23 +99,18 @@ namespace UP_Exercise_7
                 }
                 else if (symbol == ".")
                 {
-                    if (!(MainTextBox.Text.Split("×÷+-()".ToCharArray()).Last().Where(x => ".".Contains(x)).Count() == 1 && ".".Contains(".")))
+                    if (!(MainTextBox.Text.Split("×÷+-()".ToCharArray()).Last().Count(x => ".".Contains(x)) == 1))
                     {
-                        if (MainTextBox.Text.LastIndexOf("E") >= MainTextBox.Text.Length - 5)
-                        {
-                            MainTextBox.Text += "×";
-                        }
                         if (MainTextBox.Text.Length == 0 || MainTextBox.Text.Length > 0 && !numbers.Contains(MainTextBox.Text[MainTextBox.Text.Length - 1].ToString()))
                         {
                             MainTextBox.Text += "0";
                         }
-                        
                         MainTextBox.Text += ".";
                     }
                 }
                 else if (symbol == "(")
                 {
-                    if(MainTextBox.Text.Length > 0 && !"%×÷+-(".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
+                    if (MainTextBox.Text.Length > 0 && !"%×÷+-(".Contains(MainTextBox.Text[MainTextBox.Text.Length - 1]))
                     {
                         MainTextBox.Text += "×";
                     }
