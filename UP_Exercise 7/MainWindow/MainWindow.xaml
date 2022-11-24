@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UP_Exercise_7"
         mc:Ignorable="d"
-        Title="Демьянов Артём 2ПКС-220" Icon="Icon.ico"
+        Title="Демьянов Артём 3ПКС-220" Icon="Icon.ico"
         Height="500" Width="800" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid>
         <UniformGrid Name="MainUniformGrid" Rows="5" Columns="5" Height="320" Width="780" Margin="10,154,10,10"> </UniformGrid>
